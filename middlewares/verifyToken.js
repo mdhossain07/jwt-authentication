@@ -1,24 +1,33 @@
 const { TokenService } = require("../services");
+const timeFormatter = require("../utils/timeFormatter");
 
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+const verifyToken = async (req, res, next) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
 
-  if (!token) {
-    res.status(401).send({ message: "Unauthorized Access" });
+    if (!token) {
+      return res.status(401).send({ message: "Unauthorized Access" });
+    }
+
+    const tokenExpiration = timeFormatter.accessTokenExpiration(
+      process.env.ACCESS_TOKEN_EXPIRATION
+    );
+
+    const user = await TokenService.tokenVerification(
+      token,
+      process.env.ACCESS_TOKEN_SECRET
+    );
+
+    if (!user) {
+      return res.status(403).send({ message: "Forbidden Access" });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    return res.status(401).send({ message: "Please authenticate" });
   }
-
-  const decode = TokenService.tokenVerification(
-    token,
-    process.env.ACCESS_TOKEN_SECRET
-  );
-
-  if (!decode) {
-    res.status(403).send({ message: "Forbidden Access" });
-  }
-
-  req.user = decode.user;
-  next();
 };
 
 module.exports = verifyToken;

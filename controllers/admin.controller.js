@@ -21,7 +21,10 @@ class AdminController {
       const newAdmin = await AdminService.registerAdmin(req.body);
       res
         .status(200)
-        .send({ mesage: "Admin Created", data: exclude(newAdmin) });
+        .send({
+          mesage: "Admin Created",
+          data: exclude(newAdmin, ["password"]),
+        });
     } catch (error) {
       res.status(400).send({
         message: "Admin Create Failed!",

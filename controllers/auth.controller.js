@@ -1,5 +1,4 @@
 const { AuthService, TokenService } = require("../services");
-const jwtGenerator = require("../utils/jwtGenerator");
 const { authValidation } = require("../validations");
 
 class AuthController {
@@ -20,6 +19,8 @@ class AuthController {
 
       const tokens = await TokenService.generateAuthTokens(user?.email);
 
+      await AuthService.saveRefreshToken(email, tokens.refresh.refreshToken);
+
       res.status(200).send({ succees: true, user, tokens });
     } catch (error) {
       res.status(400).send({ success: false, message: error.message });
@@ -31,10 +32,21 @@ class AuthController {
       await authValidation.refreshTokens.body.validateAsync(req.body, {
         abortEarly: false,
       });
+
       const tokens = await AuthService.refreshAuth(req.body.refreshToken);
       res.status(200).send({ ...tokens });
     } catch (error) {
       res.status(400).send({ success: false, message: error.message });
+    }
+  };
+
+  logOut = async (req, res) => {
+    try {
+      const { email } = req.body;
+      await AuthService.logOutUser(email);
+      res.send({ success: true, message: "Logged Out!" });
+    } catch (error) {
+      res.status(500).send({ success: false, message: error.message });
     }
   };
 }

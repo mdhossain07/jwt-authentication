@@ -1,7 +1,5 @@
 const jwt = require("jsonwebtoken");
-const dayjs = require("dayjs");
-const duration = require("dayjs/plugin/duration");
-dayjs.extend(duration);
+const timeFormatter = require("../utils/timeFormatter");
 
 class TokenService {
   generateToken = (payload, secret, expiration) => {
@@ -10,18 +8,20 @@ class TokenService {
     });
   };
 
-  tokenVerification = (token, secret) => {
-    return jwt.verify(token, secret);
+  tokenVerification = async (token, secret) => {
+    const payload = await jwt.verify(token, secret);
+    console.log("payload", payload);
+    return payload.user;
   };
 
   generateAuthTokens = async (payload) => {
-    const accessTokenExpiration = dayjs
-      .duration(process.env.ACCESS_TOKEN_EXPIRATION, "minutes")
-      .asSeconds();
+    const accessTokenExpiration = timeFormatter.accessTokenExpiration(
+      process.env.ACCESS_TOKEN_EXPIRATION
+    );
 
-    const refreshTokenExpiration = dayjs
-      .duration(process.env.REFRESH_TOKEN_EXPIRATION, "days")
-      .asSeconds();
+    const refreshTokenExpiration = timeFormatter.refreshTokenExpiration(
+      process.env.REFRESH_TOKEN_EXPIRATION
+    );
     const accessToken = this.generateToken(
       payload,
       process.env.ACCESS_TOKEN_SECRET,
