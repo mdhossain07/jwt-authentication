@@ -10,10 +10,6 @@ const verifyToken = async (req, res, next) => {
       return res.status(401).send({ message: "Unauthorized Access" });
     }
 
-    const tokenExpiration = timeFormatter.accessTokenExpiration(
-      process.env.ACCESS_TOKEN_EXPIRATION
-    );
-
     const user = await TokenService.tokenVerification(
       token,
       process.env.ACCESS_TOKEN_SECRET

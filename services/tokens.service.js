@@ -10,7 +10,6 @@ class TokenService {
 
   tokenVerification = async (token, secret) => {
     const payload = await jwt.verify(token, secret);
-    console.log("payload", payload);
     return payload.user;
   };
 
