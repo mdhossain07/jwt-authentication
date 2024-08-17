@@ -1,9 +1,9 @@
-const { AuthService } = require("../services");
+const { AuthService, TokenService } = require("../services");
 const jwtGenerator = require("../utils/jwtGenerator");
 const { authValidation } = require("../validations");
 
 class AuthController {
-  loginUserWithEmailAndPassword = async (req, res) => {
+  login = async (req, res) => {
     try {
       const { email, password } = req.body;
 
@@ -18,10 +18,21 @@ class AuthController {
         password
       );
 
-      // Generate JWT token
-      const token = jwtGenerator(user?.email);
+      const tokens = await TokenService.generateAuthTokens(user?.email);
 
-      res.status(200).send({ success: true, token });
+      res.status(200).send({ succees: true, user, tokens });
+    } catch (error) {
+      res.status(400).send({ success: false, message: error.message });
+    }
+  };
+
+  refreshTokens = async (req, res) => {
+    try {
+      await authValidation.refreshTokens.body.validateAsync(req.body, {
+        abortEarly: false,
+      });
+      const tokens = await AuthService.refreshAuth(req.body.refreshToken);
+      res.status(200).send({ ...tokens });
     } catch (error) {
       res.status(400).send({ success: false, message: error.message });
     }

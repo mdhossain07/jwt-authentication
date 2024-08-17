@@ -1,12 +1,7 @@
-function exclude(obj) {
-  for (key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      if (key === "password") {
-        delete obj[key];
-      }
-    }
+function exclude(obj, keys) {
+  for (let key of keys) {
+    delete obj[key];
   }
-
   return obj;
 }
 

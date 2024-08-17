@@ -9,7 +9,7 @@ try {
   app.use(cors());
   app.use(express.json());
 
-  postgresql: app.use("/api/v1", routes);
+  app.use("/api/v1", routes);
 
   app.get("/", (req, res) => {
     res.json({ message: "Hello World" });

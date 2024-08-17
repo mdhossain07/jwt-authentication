@@ -1,4 +1,5 @@
-const AdminService = require("../services/admin.service");
+const AdminService = require("./admin.service");
 const AuthService = require("./auth.service");
+const TokenService = require("./tokens.service");
 
-module.exports = { AdminService, AuthService };
+module.exports = { AdminService, AuthService, TokenService };

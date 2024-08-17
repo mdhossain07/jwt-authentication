@@ -7,4 +7,10 @@ const login = {
   }),
 };
 
-module.exports = { login };
+const refreshTokens = {
+  body: Joi.object({
+    refreshToken: Joi.string().required(),
+  }),
+};
+
+module.exports = { login, refreshTokens };
